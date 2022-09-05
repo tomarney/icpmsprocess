@@ -1,0 +1,33 @@
+# Settings for processing steps
+# =============================
+
+# MS cycle timings
+# ----------------
+blank_cycles: 58
+signal_cycles:
+  start: 64
+  end: 181
+
+
+# constants
+# ---------
+
+# 204Hg/202Hg known ratio
+Hg204_202_ratio: 0.23007367716008
+
+
+# package settings
+# ----------------
+sample_map: inputs/sample_map.csv
+# data files settings
+data_dir: "data/" # where the data files are
+file_ext: ".exp" # the file extension of the data files
+header_row: 22 # the row containing column headers (top row is row 0)
+comment_char: "*" # ignore any row starting with this (one character only)
+index_col: "Cycle" # which column to reference rows as
+intensity_cols: # the column names holding intensity (voltage) data
+  - 202Hg
+  - 204Pb
+  - 206Pb
+  - 207Pb
+  - 208Pb
