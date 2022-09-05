@@ -20,6 +20,7 @@ The package has the following structure:
 ```txt
 .
 ├── settings.yml
+├── constants.yml
 ├── sampleMap.csv
 └── data/
     ├── S-001.exp
@@ -46,6 +47,8 @@ The package has the following structure:
       start: 70
       end: 180
     ```
+
+- a second YAML file `constants.yml` containing the known reference material preferred values and natural constants
 
 ## Acknowledgements
 

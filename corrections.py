@@ -1,6 +1,6 @@
 import pandas as pd
 
-def internal(data: pd.DataFrame, config: dict) -> pd.DataFrame:
+def internal(data: pd.DataFrame, config: dict, constants: dict) -> pd.DataFrame:
   """
   Apply internal corrections to a single sample.
   Corrections applies blank correction and accounts for isobaric interference of 204Hg on 204Pb, using 202Hg
@@ -22,7 +22,7 @@ def internal(data: pd.DataFrame, config: dict) -> pd.DataFrame:
   signal = signal - blank.mean(axis=0)
   
   # correct for Hg204 interference
-  Hg204 = signal.loc[:,"202Hg"] * config["Hg204_202_ratio"]
+  Hg204 = signal.loc[:,"202Hg"] * constants["Hg_4_2"]
   signal["204Pb"] = signal["204Pb"] - Hg204
 
   return signal
