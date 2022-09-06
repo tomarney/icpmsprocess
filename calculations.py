@@ -10,11 +10,14 @@ def reducePb(data: pd.DataFrame, sampleInfo: pd.Series) -> dict:
   ----------
   data: Pandas.DataFrame
     The DataFrame containing internally corrected mass spectrometry data
+  sampleInfo: Pandas.Series
+    A series containing the name and type (standard/control/sample) of the observation
   
   Returns
   -------
   a Pandas.Series summary of the input data
   """
+  
   # calculate ratios
   Pb6_4 = data["206Pb"]/data["204Pb"]
   Pb7_4 = data["207Pb"]/data["204Pb"]
@@ -35,7 +38,8 @@ def reducePb(data: pd.DataFrame, sampleInfo: pd.Series) -> dict:
     "Pb7_6": Pb7_6.mean(),
     "Pb7_6_err": Pb7_6.sem(ddof=0),
     "Pb8_6": Pb8_6.mean(),
-    "Pb8_6_err": Pb8_6.sem(ddof=0)
+    "Pb8_6_err": Pb8_6.sem(ddof=0),
+    "Pb8_int": data["208Pb"].mean()
   })
 
   return ratios

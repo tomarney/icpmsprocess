@@ -3,25 +3,19 @@
 import os
 from typing import List
 import pandas as pd
-import yaml
 import glob
 import corrections as corr
 import calculations as calc
-
-# load config file
-with open('settings.yml') as y:
-    config = yaml.safe_load(y)
-with open('constants.yml') as con:
-    const = yaml.safe_load(con)
+import config as c
 
 # TODO: make a dataclass
-sampleMapPath: str = config["sample_map"]
-dataDir: str = config["data_dir"]
-fileExt: str = config["file_ext"]
-headerRow: int = config["header_row"]
-commentChar: str = config["comment_char"]
-indexCol: str = config["index_col"]
-intCols: List[str] = config["intensity_cols"]
+sampleMapPath: str = c.SETTINGS["sample_map"]
+dataDir: str = c.SETTINGS["data_dir"]
+fileExt: str = c.SETTINGS["file_ext"]
+headerRow: int = c.SETTINGS["header_row"]
+commentChar: str = c.SETTINGS["comment_char"]
+indexCol: str = c.SETTINGS["index_col"]
+intCols: List[str] = c.SETTINGS["intensity_cols"]
 
 
 # %%
@@ -51,7 +45,7 @@ for fp in listOfDataFiles:
     d = d.loc[:, intCols].dropna(how="all")
 
     # apply internal corrections
-    r = corr.internal(d, config, const)
+    r = corr.internal(d)
     # reduce data to ratios with errors
     r = calc.reducePb(r, sampleInfo)
 
@@ -61,4 +55,3 @@ for fp in listOfDataFiles:
 # add all reduced data to one dataframe and save as CSV
 result = pd.DataFrame(summaryDictList).set_index("sample")
 result.to_csv("output/results_internally-corrected.csv")
-
