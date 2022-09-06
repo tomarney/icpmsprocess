@@ -53,5 +53,11 @@ for fp in listOfDataFiles:
 
 # %%
 # add all reduced data to one dataframe and save as CSV
-result = pd.DataFrame(summaryDictList).set_index("sample")
-result.to_csv("output/results_internally-corrected.csv")
+resultInternalCorr = pd.DataFrame(summaryDictList).set_index("sample_name")
+resultInternalCorr.to_csv("output/results_internally-corrected.csv")
+
+# %%
+# mass bias correction
+
+resultMBC = corr.massBias(resultInternalCorr)
+resultMBC.to_csv("output/results_mass-bias-corrected.csv")

@@ -27,7 +27,7 @@ def reducePb(data: pd.DataFrame, sampleInfo: pd.Series) -> dict:
 
   # save ratios and standard errors
   ratios = dict({
-    "sample": sampleInfo.sample_name.item(),
+    "sample_name": sampleInfo.sample_name.item(),
     "type": sampleInfo.type.item(),
     "Pb6_4": Pb6_4.mean(),
     "Pb6_4_err": Pb6_4.sem(ddof=0),
