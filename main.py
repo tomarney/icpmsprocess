@@ -3,6 +3,7 @@
 import os
 from typing import List
 import pandas as pd
+import matplotlib.pyplot as plt
 import glob
 import corrections as corr
 import calculations as calc
@@ -56,8 +57,21 @@ for fp in listOfDataFiles:
 resultInternalCorr = pd.DataFrame(summaryDictList).set_index("sample_name")
 resultInternalCorr.to_csv("output/results_internally-corrected.csv")
 
+
+# %%
+# plot all observations of reference standards to check for drift
+
+refPlot = resultInternalCorr[resultInternalCorr.type.eq('standard')].plot(subplots=True, figsize=(8,16))
+refPlot[0].get_figure().savefig('output/NIST610-internal-corrected.png')
+
 # %%
 # mass bias correction
 
 resultMBC = corr.massBias(resultInternalCorr)
 resultMBC.to_csv("output/results_mass-bias-corrected.csv")
+
+# %%
+# plot all observations of NIST control to check for drift after mass-bias correction
+
+ctrlPlot = resultMBC[resultMBC.sample_name.str.contains('NIST_612')].plot(subplots=True, figsize=(8,16))
+ctrlPlot[0].get_figure().savefig('output/NIST612-mass-bias-corrected.png')
