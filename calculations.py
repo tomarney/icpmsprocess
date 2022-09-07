@@ -1,6 +1,8 @@
+from typing import Tuple
 import pandas as pd
+import cleaning
 
-def reducePb(data: pd.DataFrame, sampleInfo: pd.Series) -> dict:
+def reducePb(data: pd.DataFrame, sampleInfo: pd.Series) -> Tuple[pd.Series, pd.Series]:
   """
   Data reduction for a single sample
 
@@ -19,27 +21,30 @@ def reducePb(data: pd.DataFrame, sampleInfo: pd.Series) -> dict:
   """
   
   # calculate ratios
-  Pb6_4 = data["206Pb"]/data["204Pb"]
-  Pb7_4 = data["207Pb"]/data["204Pb"]
-  Pb8_4 = data["208Pb"]/data["204Pb"]
-  Pb7_6 = data["207Pb"]/data["206Pb"]
-  Pb8_6 = data["208Pb"]/data["206Pb"]
-
-  # save ratios and standard errors
-  ratios = dict({
-    "sample_name": sampleInfo.sample_name.item(),
-    "type": sampleInfo.type.item(),
-    "Pb6_4": Pb6_4.mean(),
-    "Pb6_4_err": Pb6_4.sem(ddof=0),
-    "Pb7_4": Pb7_4.mean(),
-    "Pb7_4_err": Pb7_4.sem(ddof=0),
-    "Pb8_4": Pb8_4.mean(),
-    "Pb8_4_err": Pb8_4.sem(ddof=0),
-    "Pb7_6": Pb7_6.mean(),
-    "Pb7_6_err": Pb7_6.sem(ddof=0),
-    "Pb8_6": Pb8_6.mean(),
-    "Pb8_6_err": Pb8_6.sem(ddof=0),
-    "Pb8_int": data["208Pb"].mean()
+  ratioCycles = pd.DataFrame({
+    "Pb6_4": data["206Pb"]/data["204Pb"],
+    "Pb7_4": data["207Pb"]/data["204Pb"],
+    "Pb8_4": data["208Pb"]/data["204Pb"],
+    "Pb7_6": data["207Pb"]/data["206Pb"],
+    "Pb8_6": data["208Pb"]/data["206Pb"]
   })
 
-  return ratios
+  comments, r = cleaning.removeOutliers(ratioCycles)
+
+  # save ratios and standard errors
+  ratios = pd.Series({
+    "sample_name": sampleInfo.sample_name.item(),
+    "type": sampleInfo.type.item(),
+    "Pb6_4":     r.Pb6_4.mean(),
+    "Pb6_4_err": r.Pb6_4.sem(ddof=0),
+    "Pb7_4":     r.Pb7_4.mean(),
+    "Pb7_4_err": r.Pb7_4.sem(ddof=0),
+    "Pb8_4":     r.Pb8_4.mean(),
+    "Pb8_4_err": r.Pb8_4.sem(ddof=0),
+    "Pb7_6":     r.Pb7_6.mean(),
+    "Pb7_6_err": r.Pb7_6.sem(ddof=0),
+    "Pb8_6":     r.Pb8_6.mean(),
+    "Pb8_6_err": r.Pb8_6.sem(ddof=0),
+  })
+
+  return comments, ratios

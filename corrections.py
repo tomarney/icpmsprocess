@@ -7,12 +7,20 @@ import config as c
 def internal(data: pd.DataFrame) -> Tuple[pd.Series, pd.DataFrame]:
     """
     Apply internal corrections to a single sample.
-    Corrections applies blank correction and accounts for isobaric interference of 204Hg on 204Pb, using 202Hg
+
+    Applies blank correction and accounts for isobaric interference of 204Hg on 204Pb, using 202Hg. Removes outliers from the blank, and removes cycles where the blank is greater than the signal
 
     Parameters
     ----------
     data: Pandas.DataFrame
       The DataFrame containing the raw mass spectrometry data
+
+    Returns
+    -------
+    signal: Pandas.DataFrame
+      The internally corrected data
+    comments: Pandas.Series
+      a record of the number of rows dropped
     """
     # extract settings from config
     blankCycles = (1, c.SETTINGS["blank_cycles"])
@@ -20,23 +28,38 @@ def internal(data: pd.DataFrame) -> Tuple[pd.Series, pd.DataFrame]:
                     ["start"], c.SETTINGS["signal_cycles"]["end"])
 
     # split data into blank, signal, and washout
-    blank = data.loc[blankCycles[0]: blankCycles[1]]
-    signal = data.loc[signalCycles[0]: signalCycles[1]]  # detect burn-through?
+    blankRaw = data.loc[blankCycles[0]: blankCycles[1]]
+    signalRaw = data.loc[signalCycles[0]: signalCycles[1]]  # detect burn-through?
+
+    blankComms, blank = cleaning.removeOutliers(
+        blankRaw, commentName="outlier_blank_cycles")
 
     # subtract average blank
-    signal = signal - blank.mean(axis=0)
+    signal = signalRaw - blank.mean(axis=0)
 
     # remove any cycles where the signal is smaller than the blank
-    comments, signalClean = cleaning.removeNegativeCycles(signal)
+    sigComms, signalClean = cleaning.removeNegativeCycles(signal)
 
     # correct for Hg204 interference
     Hg204 = signalClean.loc[:, "202Hg"] * c.CONST["Hg_4_2"]
-    signalClean.loc[:,"204Pb"] = signalClean.loc[:, "204Pb"] - Hg204
+    signalClean.loc[:, "204Pb"] = signalClean.loc[:, "204Pb"] - Hg204
+
+    # combine comments
+    comments = pd.concat([blankComms, sigComms])
 
     return (comments, signalClean)
 
 
 def massBias(data: pd.DataFrame) -> pd.DataFrame:
+    """
+    Apply internal corrections to a single sample.
+    Corrections applies blank correction and accounts for isobaric interference of 204Hg on 204Pb, using 202Hg
+
+    Parameters
+    ----------
+    data: Pandas.DataFrame
+      The DataFrame containing the raw mass spectrometry data
+    """
 
     # make sure DataFrame has a monotonically increasing int index
     d = data.reset_index()
@@ -54,21 +77,21 @@ def massBias(data: pd.DataFrame) -> pd.DataFrame:
             continue
 
         # not a standard: treat controls & samples identically.
-        
+
         if row.Index == len(d)-1:
-          # last row and not a standard: don't try and find next standard
-          # just use previous standard
-          s = prevStd
+            # last row and not a standard: don't try and find next standard
+            # just use previous standard
+            s = prevStd
 
         else:
-          # find the next standard in the run queue
-          nextStdIdx = int(stdIxs[stdIxs > row.Index].min())
-          nextStd = d.iloc[nextStdIdx]
+            # find the next standard in the run queue
+            nextStdIdx = int(stdIxs[stdIxs > row.Index].min())
+            nextStd = d.iloc[nextStdIdx]
 
-          # join the two standards
-          stds = pd.concat([prevStd, nextStd], axis=1).T
-          # find their average values
-          s = stds.drop(["sample_name", "type"], axis=1).mean(axis=0)
+            # join the two standards
+            stds = pd.concat([prevStd, nextStd], axis=1).T.convert_dtypes()
+            # find their average values
+            s = stds.select_dtypes(include=['number']).mean(axis=0)
 
         # get accepted values for reference standard
         v = c.CONST['NIST610']

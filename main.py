@@ -26,8 +26,8 @@ listOfDataFiles = glob.glob(glob.escape(dataDir) + "/*" + fileExt)
 sampleMap = pd.read_csv(sampleMapPath)
 
 # create an empty list. We'll append each sample result in the loop
-summaryDictList = []
-commentDictList = []
+summaryList = []
+commentList = []
 
 # process each data file in turn
 for fp in listOfDataFiles:
@@ -48,21 +48,23 @@ for fp in listOfDataFiles:
     # apply internal corrections
     commInt, r = corr.internal(d)
     # reduce data to ratios with errors
-    r = calc.reducePb(r, sampleInfo)
+    commReduc, r = calc.reducePb(r, sampleInfo)
 
-    commInt['sample_name'] = sampleInfo.sample_name.item()
-    commInt['type'] = sampleInfo.type.item()
+    comm = pd.Series({
+      'sample_name': sampleInfo.sample_name.item(),
+      'type': sampleInfo.type.item()
+    })
 
-    summaryDictList.append(r)
-    commentDictList.append(commInt)
+    summaryList.append(r)
+    commentList.append(pd.concat([comm,commInt,commReduc]))
 # END for
 
 # %%
 # add all reduced data to one dataframe and save as CSV
-resultInternalCorr = pd.DataFrame(summaryDictList).set_index("sample_name")
+resultInternalCorr = pd.DataFrame(summaryList).set_index("sample_name")
 resultInternalCorr.to_csv("output/results_internally-corrected.csv")
 
-comments = pd.DataFrame(commentDictList).set_index("sample_name")
+comments = pd.DataFrame(commentList).set_index("sample_name")
 comments.to_csv("output/comments.csv")
 
 

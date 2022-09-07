@@ -1,5 +1,6 @@
 from typing import Tuple
 import pandas as pd
+from scipy.stats import zscore
 
 
 def removeNegativeCycles(data: pd.DataFrame) -> Tuple[pd.Series, pd.DataFrame]:
@@ -19,13 +20,50 @@ def removeNegativeCycles(data: pd.DataFrame) -> Tuple[pd.Series, pd.DataFrame]:
       a record of the number of rows dropped
     """
 
-    negVals = data < 0
+    numCols = data.select_dtypes(include=['number']).columns
+    negVals = data[numCols] < 0
     negRows = negVals.any(axis=1)
     # .copy() to avoid pandas SettingWithCopyWarning
     dataClean = data.copy().loc[~negRows, :]
 
     comments = pd.Series({
-        "dropped_cycles_negative": len(data) - len(dataClean)
+        "negative_signal_cycles": len(data) - len(dataClean)
+    })
+
+    return comments, dataClean
+
+
+
+def removeOutliers(data: pd.DataFrame, commentName: str = "outlier_signal_cycles") -> Tuple[pd.Series, pd.DataFrame]:
+    """
+    remove any cycles which contain outliers in any ratio
+
+    Outliers are defined as any value greater than 3 standard deviations away from the mean.
+
+    Parameters
+    ----------
+    data: Pandas.DataFrame
+      The DataFrame containing mass spectrometry data
+    commentName: str
+      The column name giving the number of cycles removed. Defaults to "outlier_signal_cycles"
+
+    Returns
+    -------
+    dataClean: Pandas.DataFrame
+      The cleaned data
+    comments: Pandas.Series
+      a record of the number of rows dropped
+    """
+
+    numCols = data.select_dtypes(include=['number']).copy()
+    isOutlier: pd.DataFrame = numCols.apply(zscore).apply(abs) >= 3
+
+    hasOutliers = isOutlier.any(axis=1)
+    # .copy() to avoid pandas SettingWithCopyWarning
+    dataClean = data.copy().loc[~hasOutliers, :]
+
+    comments = pd.Series({
+        commentName: len(data) - len(dataClean)
     })
 
     return comments, dataClean
