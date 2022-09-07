@@ -26,7 +26,8 @@ def reducePb(data: pd.DataFrame, sampleInfo: pd.Series) -> Tuple[pd.Series, pd.S
     "Pb7_4": data["207Pb"]/data["204Pb"],
     "Pb8_4": data["208Pb"]/data["204Pb"],
     "Pb7_6": data["207Pb"]/data["206Pb"],
-    "Pb8_6": data["208Pb"]/data["206Pb"]
+    "Pb8_6": data["208Pb"]/data["206Pb"],
+    "Pbint": data['204Pb']+data['206Pb']+data['207Pb']+data['208Pb']
   })
 
   comments, r = cleaning.removeOutliers(ratioCycles)
@@ -45,6 +46,8 @@ def reducePb(data: pd.DataFrame, sampleInfo: pd.Series) -> Tuple[pd.Series, pd.S
     "Pb7_6_err": r.Pb7_6.sem(ddof=0),
     "Pb8_6":     r.Pb8_6.mean(),
     "Pb8_6_err": r.Pb8_6.sem(ddof=0),
+    "Pbint":     r.Pbint.mean(),
+    "Pbint_err": r.Pbint.sem(ddof=0),
   })
 
   return comments, ratios

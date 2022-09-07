@@ -72,6 +72,7 @@ def massBias(data: pd.DataFrame) -> pd.DataFrame:
     # iterate over each row as a named Tuple
     for row in d.itertuples():
         if row.type == "standard":
+            # TODO: check if standard values are anomalous, and don't update prevStd if so
             prevStd = pd.Series(row._asdict())  # convert back to a Series
             continue
 
@@ -110,7 +111,9 @@ def massBias(data: pd.DataFrame) -> pd.DataFrame:
                 "Pb7_6":       row.Pb7_6 / s.Pb7_6 * v.Pb_7_6,
                 "Pb7_6_err":   row.Pb7_6_err,
                 "Pb8_6":       row.Pb8_6 / s.Pb8_6 * v.Pb_8_6,
-                "Pb8_6_err":   row.Pb8_6_err
+                "Pb8_6_err":   row.Pb8_6_err,
+                "Pbint":       row.Pbint, # pass through (no correction)
+                "Pbint_err":   row.Pbint_err
             }
         )
     # END for
