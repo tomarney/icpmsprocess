@@ -57,11 +57,11 @@ for fp in listOfDataFiles:
 
 # %%
 # add all reduced data to one dataframe and save as CSV
-resultInternalCorr = pd.DataFrame(summaryList).set_index("sample_name")
-resultInternalCorr.to_csv("output/results_internally-corrected.csv")
+resultInternalCorr = pd.DataFrame(summaryList)
+resultInternalCorr.to_csv(f'{SETTINGS.output_dir}results_internally-corrected.csv', index=False)
 
-comments = pd.DataFrame(commentList).set_index("sample_name")
-comments.to_csv("output/comments.csv")
+comments = pd.DataFrame(commentList)
+comments.to_csv(f'{SETTINGS.output_dir}comments.csv', index=False)
 
 
 # %%
@@ -75,7 +75,7 @@ refPlot[0].get_figure().savefig('output/NIST610-internal-corrected.png')
 # mass bias correction
 
 resultMBC = corr.massBias(resultInternalCorr)
-resultMBC.to_csv("output/results_mass-bias-corrected.csv")
+resultMBC.to_csv(f'{SETTINGS.output_dir}results_mass-bias-corrected.csv', index=False)
 
 # %%
 # plot all observations of NIST control to check for drift after mass-bias correction

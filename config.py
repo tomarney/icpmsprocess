@@ -9,6 +9,7 @@ class Settings(YAMLWizard):
   signal_cycles: Tuple[int,int]
   sample_map: str
   data_dir: str
+  output_dir: str
   file_ext: str
   header_row: int
   comment_char: str

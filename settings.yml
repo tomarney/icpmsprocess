@@ -14,6 +14,7 @@ signal_cycles:
 sample_map: inputs/sample_map.csv
 # data files settings
 data_dir: "inputs/data/" # where the data files are
+output_dir: "output/" # where to save CSV files and plots
 file_ext: ".exp" # the file extension of the data files
 header_row: 22 # the row containing column headers (top row is row 0)
 comment_char: "*" # ignore any row starting with this (one character only)
