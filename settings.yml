@@ -5,8 +5,8 @@
 # ----------------
 blank_cycles: 58
 signal_cycles:
-  start: 64
-  end: 181
+  - 64
+  - 181
 
 
 # package settings

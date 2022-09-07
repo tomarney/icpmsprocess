@@ -1,7 +1,40 @@
-import yaml
+from dataclasses import dataclass
+from dataclass_wizard import YAMLWizard
+from typing import List, Tuple
 
-with open('settings.yml') as s:
-  SETTINGS = yaml.safe_load(s)
 
-with open('constants.yml') as c:
-  CONST = yaml.safe_load(c)
+@dataclass
+class Settings(YAMLWizard):
+  blank_cycles: int
+  signal_cycles: Tuple[int,int]
+  sample_map: str
+  data_dir: str
+  file_ext: str
+  header_row: int
+  comment_char: str
+  index_col: str | int
+  intensity_cols: List[str]
+
+@dataclass
+class PbIsotopeList:
+  Pb_6_4: float
+  Pb_7_4: float
+  Pb_7_6: float
+  Pb_8_4: float
+  Pb_8_6: float
+
+@dataclass
+class Constants(YAMLWizard):
+  Hg_4_2: float
+  NIST610: PbIsotopeList
+  NIST612: PbIsotopeList
+
+try:
+  SETTINGS = Settings.from_yaml_file('settings.yml')
+except:
+  raise Exception("Could not load settings file. Please make sure it exists and has the correct structure.")
+
+try:
+  CONST = Constants.from_yaml_file('constants.yml')
+except:
+  raise Exception("Could not load constants file. Please make sure it exists and has the correct structure.")

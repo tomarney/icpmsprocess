@@ -1,7 +1,7 @@
 from typing import List, Tuple
 import pandas as pd
 import cleaning
-import config as c
+from config import SETTINGS, CONST
 
 
 def internal(data: pd.DataFrame) -> Tuple[pd.Series, pd.DataFrame]:
@@ -23,9 +23,8 @@ def internal(data: pd.DataFrame) -> Tuple[pd.Series, pd.DataFrame]:
       a record of the number of rows dropped
     """
     # extract settings from config
-    blankCycles = (1, c.SETTINGS["blank_cycles"])
-    signalCycles = (c.SETTINGS["signal_cycles"]
-                    ["start"], c.SETTINGS["signal_cycles"]["end"])
+    blankCycles = (1, SETTINGS.blank_cycles)
+    signalCycles = (SETTINGS.signal_cycles[0], SETTINGS.signal_cycles[1])
 
     # split data into blank, signal, and washout
     blankRaw = data.loc[blankCycles[0]: blankCycles[1]]
@@ -41,7 +40,7 @@ def internal(data: pd.DataFrame) -> Tuple[pd.Series, pd.DataFrame]:
     sigComms, signalClean = cleaning.removeNegativeCycles(signal)
 
     # correct for Hg204 interference
-    Hg204 = signalClean.loc[:, "202Hg"] * c.CONST["Hg_4_2"]
+    Hg204 = signalClean.loc[:, "202Hg"] * CONST.Hg_4_2
     signalClean.loc[:, "204Pb"] = signalClean.loc[:, "204Pb"] - Hg204
 
     # combine comments
@@ -94,7 +93,7 @@ def massBias(data: pd.DataFrame) -> pd.DataFrame:
             s = stds.select_dtypes(include=['number']).mean(axis=0)
 
         # get accepted values for reference standard
-        v = c.CONST['NIST610']
+        v = CONST.NIST610
 
         # correct for mass bias
         # sampleValue / AverageStandardValue * knownStandardValue
@@ -102,15 +101,15 @@ def massBias(data: pd.DataFrame) -> pd.DataFrame:
             {
                 "sample_name": row.sample_name,
                 "type":        row.type,
-                "Pb6_4":       row.Pb6_4 / s.Pb6_4 * v["Pb_6_4"],
+                "Pb6_4":       row.Pb6_4 / s.Pb6_4 * v.Pb_6_4,
                 "Pb6_4_err":   row.Pb6_4_err,
-                "Pb7_4":       row.Pb7_4 / s.Pb7_4 * v["Pb_7_4"],
+                "Pb7_4":       row.Pb7_4 / s.Pb7_4 * v.Pb_7_4,
                 "Pb7_4_err":   row.Pb7_4_err,
-                "Pb8_4":       row.Pb8_4 / s.Pb8_4 * v["Pb_8_4"],
+                "Pb8_4":       row.Pb8_4 / s.Pb8_4 * v.Pb_8_4,
                 "Pb8_4_err":   row.Pb8_4_err,
-                "Pb7_6":       row.Pb7_6 / s.Pb7_6 * v["Pb_7_6"],
+                "Pb7_6":       row.Pb7_6 / s.Pb7_6 * v.Pb_7_6,
                 "Pb7_6_err":   row.Pb7_6_err,
-                "Pb8_6":       row.Pb8_6 / s.Pb8_6 * v["Pb_8_6"],
+                "Pb8_6":       row.Pb8_6 / s.Pb8_6 * v.Pb_8_6,
                 "Pb8_6_err":   row.Pb8_6_err
             }
         )
