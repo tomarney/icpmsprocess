@@ -1,9 +1,10 @@
-from typing import List
+from typing import List, Tuple
 import pandas as pd
+import cleaning
 import config as c
 
 
-def internal(data: pd.DataFrame) -> pd.DataFrame:
+def internal(data: pd.DataFrame) -> Tuple[pd.Series, pd.DataFrame]:
     """
     Apply internal corrections to a single sample.
     Corrections applies blank correction and accounts for isobaric interference of 204Hg on 204Pb, using 202Hg
@@ -25,11 +26,14 @@ def internal(data: pd.DataFrame) -> pd.DataFrame:
     # subtract average blank
     signal = signal - blank.mean(axis=0)
 
-    # correct for Hg204 interference
-    Hg204 = signal.loc[:, "202Hg"] * c.CONST["Hg_4_2"]
-    signal["204Pb"] = signal["204Pb"] - Hg204
+    # remove any cycles where the signal is smaller than the blank
+    comments, signalClean = cleaning.removeNegativeCycles(signal)
 
-    return signal
+    # correct for Hg204 interference
+    Hg204 = signalClean.loc[:, "202Hg"] * c.CONST["Hg_4_2"]
+    signalClean.loc[:,"204Pb"] = signalClean.loc[:, "204Pb"] - Hg204
+
+    return (comments, signalClean)
 
 
 def massBias(data: pd.DataFrame) -> pd.DataFrame:

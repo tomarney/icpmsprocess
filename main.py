@@ -27,7 +27,7 @@ sampleMap = pd.read_csv(sampleMapPath)
 
 # create an empty list. We'll append each sample result in the loop
 summaryDictList = []
-
+commentDictList = []
 
 # process each data file in turn
 for fp in listOfDataFiles:
@@ -46,22 +46,31 @@ for fp in listOfDataFiles:
     d = d.loc[:, intCols].dropna(how="all")
 
     # apply internal corrections
-    r = corr.internal(d)
+    commInt, r = corr.internal(d)
     # reduce data to ratios with errors
     r = calc.reducePb(r, sampleInfo)
 
+    commInt['sample_name'] = sampleInfo.sample_name.item()
+    commInt['type'] = sampleInfo.type.item()
+
     summaryDictList.append(r)
+    commentDictList.append(commInt)
+# END for
 
 # %%
 # add all reduced data to one dataframe and save as CSV
 resultInternalCorr = pd.DataFrame(summaryDictList).set_index("sample_name")
 resultInternalCorr.to_csv("output/results_internally-corrected.csv")
 
+comments = pd.DataFrame(commentDictList).set_index("sample_name")
+comments.to_csv("output/comments.csv")
+
 
 # %%
 # plot all observations of reference standards to check for drift
 
-refPlot = resultInternalCorr[resultInternalCorr.type.eq('standard')].plot(subplots=True, figsize=(8,16))
+refPlot = resultInternalCorr[resultInternalCorr.type.eq(
+    'standard')].plot(subplots=True, figsize=(8, 16))
 refPlot[0].get_figure().savefig('output/NIST610-internal-corrected.png')
 
 # %%
@@ -73,5 +82,6 @@ resultMBC.to_csv("output/results_mass-bias-corrected.csv")
 # %%
 # plot all observations of NIST control to check for drift after mass-bias correction
 
-ctrlPlot = resultMBC[resultMBC.sample_name.str.contains('NIST_612')].plot(subplots=True, figsize=(8,16))
+ctrlPlot = resultMBC[resultMBC.sample_name.str.contains(
+    'NIST_612')].plot(subplots=True, figsize=(8, 16))
 ctrlPlot[0].get_figure().savefig('output/NIST612-mass-bias-corrected.png')
