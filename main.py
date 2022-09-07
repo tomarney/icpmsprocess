@@ -52,7 +52,9 @@ for fp in listOfDataFiles:
 
     comm = pd.Series({
       'sample_name': sampleInfo.sample_name.item(),
-      'type': sampleInfo.type.item()
+      'type': sampleInfo.type.item(),
+      'blank_nrows': c.SETTINGS["blank_cycles"] - commInt.outlier_blank_cycles,
+      'signal_nrows': c.SETTINGS["signal_cycles"]["end"] - c.SETTINGS["signal_cycles"]["start"] - commInt.negative_signal_cycles - commReduc.outlier_signal_cycles
     })
 
     summaryList.append(r)
