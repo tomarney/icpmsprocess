@@ -112,6 +112,10 @@ def massBias(data: pd.DataFrame) -> pd.DataFrame:
                 "Pb7_6_err":   row.Pb7_6_err,
                 "Pb8_6":       row.Pb8_6 / s.Pb8_6 * v.Pb_8_6,
                 "Pb8_6_err":   row.Pb8_6_err,
+                "Pb6_7":       row.Pb6_7 / s.Pb6_7 * v.Pb_6_7,
+                "Pb6_7_err":   row.Pb6_7_err,
+                "Pb8_7":       row.Pb8_7 / s.Pb8_7 * v.Pb_8_7,
+                "Pb8_7_err":   row.Pb8_7_err,
                 "Pbint":       row.Pbint, # pass through (no correction)
                 "Pbint_err":   row.Pbint_err
             }

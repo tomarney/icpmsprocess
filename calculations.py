@@ -27,6 +27,8 @@ def reducePb(data: pd.DataFrame, sampleInfo: pd.Series) -> Tuple[pd.Series, pd.S
     "Pb8_4": data["208Pb"]/data["204Pb"],
     "Pb7_6": data["207Pb"]/data["206Pb"],
     "Pb8_6": data["208Pb"]/data["206Pb"],
+    "Pb6_7": data["206Pb"]/data["207Pb"],
+    "Pb8_7": data["208Pb"]/data["207Pb"],
     "Pbint": data['204Pb']+data['206Pb']+data['207Pb']+data['208Pb']
   })
 
@@ -46,6 +48,10 @@ def reducePb(data: pd.DataFrame, sampleInfo: pd.Series) -> Tuple[pd.Series, pd.S
     "Pb7_6_err": r.Pb7_6.sem(ddof=0),
     "Pb8_6":     r.Pb8_6.mean(),
     "Pb8_6_err": r.Pb8_6.sem(ddof=0),
+    "Pb6_7":     r.Pb6_7.mean(),
+    "Pb6_7_err": r.Pb6_7.sem(ddof=0),
+    "Pb8_7":     r.Pb8_7.mean(),
+    "Pb8_7_err": r.Pb8_7.sem(ddof=0),
     "Pbint":     r.Pbint.mean(),
     "Pbint_err": r.Pbint.sem(ddof=0),
   })
