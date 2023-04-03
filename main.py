@@ -27,7 +27,7 @@ commentList = []
 for fp in listOfDataFiles:
     # get name and type of this observation
     sampleInfo = sampleMap[sampleMap.file_name.str.contains(
-        os.path.basename(fp))]
+        os.path.basename(fp).replace(SETTINGS.file_ext,''))]
 
     # read the data file. Ignore the first n row and any comments, set the index
     d = pd.read_table(fp,
@@ -80,6 +80,6 @@ resultMBC.to_csv(f'{SETTINGS.output_dir}results_mass-bias-corrected.csv', index=
 # %%
 # plot all observations of NIST control to check for drift after mass-bias correction
 
-ctrlPlot = resultMBC[resultMBC.sample_name.str.contains(
-    'NIST_612')].plot(subplots=True, figsize=(8, 16))
+ctrlPlot = resultMBC.loc[resultMBC.sample_name.str.contains(
+    'NIST_612'),~resultMBC.columns.str.contains('_err')].plot(subplots=True, figsize=(8, 16))
 ctrlPlot[0].get_figure().savefig('output/NIST612-mass-bias-corrected.png')
