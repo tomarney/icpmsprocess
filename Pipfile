@@ -10,7 +10,7 @@ matplotlib = "*"
 scipy = "*"
 scikit-learn = "*"
 pyyaml = "*"
-dataclass-wizard = "*"
+dataclass-wizard = {extras = ["yaml"], version = "*"}
 
 [dev-packages]
 ipykernel = "*"

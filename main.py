@@ -81,5 +81,5 @@ resultMBC.to_csv(f'{SETTINGS.output_dir}results_mass-bias-corrected.csv', index=
 # plot all observations of NIST control to check for drift after mass-bias correction
 
 ctrlPlot = resultMBC.loc[resultMBC.sample_name.str.contains(
-    'NIST_612'),~resultMBC.columns.str.contains('_err')].plot(subplots=True, figsize=(8, 16))
+    'NIST612'),~resultMBC.columns.str.contains('_err')].plot(subplots=True, figsize=(8, 16))
 ctrlPlot[0].get_figure().savefig('output/NIST612-mass-bias-corrected.png')

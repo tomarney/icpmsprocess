@@ -5,13 +5,13 @@
 # ----------------
 blank_cycles: 58
 signal_cycles:
-  - 64
-  - 181
+  - 60
+  - 172
 
 
 # package settings
 # ----------------
-sample_map: inputs/sample_map.csv
+sample_map: "inputs/sample_map.csv"
 # data files settings
 data_dir: "inputs/data/" # where the data files are
 output_dir: "output/" # where to save CSV files and plots

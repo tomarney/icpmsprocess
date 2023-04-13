@@ -1,4 +1,5 @@
 from typing import List, Tuple
+import warnings
 import pandas as pd
 import cleaning
 from config import SETTINGS, CONST
@@ -71,6 +72,11 @@ def massBias(data: pd.DataFrame) -> pd.DataFrame:
 
     # iterate over each row as a named Tuple
     for row in d.itertuples():
+
+        if row.Index > stdIxs[-1]:
+            warnings.warn("Ignoring samples or controls after the last standard")
+            break
+        
         if row.type == "standard":
             # TODO: check if standard values are anomalous, and don't update prevStd if so
             prevStd = pd.Series(row._asdict())  # convert back to a Series
