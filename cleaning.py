@@ -38,7 +38,7 @@ def removeOutliers(data: pd.DataFrame, commentName: str = "outlier_signal_cycles
     """
     remove any cycles which contain outliers in any ratio
 
-    Outliers are defined as any value greater than 2 standard deviations away from the mean.
+    Outliers are defined as any value greater than 3 standard deviations away from the mean.
 
     Parameters
     ----------
@@ -56,7 +56,7 @@ def removeOutliers(data: pd.DataFrame, commentName: str = "outlier_signal_cycles
     """
 
     numCols = data.select_dtypes(include=['number']).copy()
-    isOutlier: pd.DataFrame = numCols.apply(zscore).apply(abs) > 2
+    isOutlier: pd.DataFrame = numCols.apply(zscore).apply(abs) > 3
 
     hasOutliers = isOutlier.any(axis=1)
     # .copy() to avoid pandas SettingWithCopyWarning
