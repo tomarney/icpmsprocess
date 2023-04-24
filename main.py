@@ -69,7 +69,7 @@ comments.to_csv(f'{SETTINGS.output_dir}comments.csv', index=False)
 
 refPlot = resultInternalCorr[resultInternalCorr.type.eq(
     'standard')].plot(subplots=True, figsize=(8, 16))
-refPlot[0].get_figure().savefig('output/NIST610-internal-corrected.png')
+refPlot[0].get_figure().savefig(f'{SETTINGS.output_dir}NIST610-internal-corrected.png')
 
 # %%
 # mass bias correction
@@ -82,4 +82,4 @@ resultMBC.to_csv(f'{SETTINGS.output_dir}results_mass-bias-corrected.csv', index=
 
 ctrlPlot = resultMBC.loc[resultMBC.sample_name.str.contains(
     'NIST612'),~resultMBC.columns.str.contains('_err')].plot(subplots=True, figsize=(8, 16))
-ctrlPlot[0].get_figure().savefig('output/NIST612-mass-bias-corrected.png')
+ctrlPlot[0].get_figure().savefig(f'{SETTINGS.output_dir}NIST612-mass-bias-corrected.png')
