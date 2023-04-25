@@ -15,6 +15,8 @@ class Settings(YAMLWizard):
   comment_char: str
   index_col: str | int
   intensity_cols: List[str]
+  low_signal_level: float
+  low_signal_metric: str
 
 @dataclass
 class PbIsotopeList:

@@ -25,3 +25,5 @@ intensity_cols: # the column names holding intensity (voltage) data
   - 206Pb
   - 207Pb
   - 208Pb
+low_signal_level: 2
+low_signal_metric: "Pb4_mean"
