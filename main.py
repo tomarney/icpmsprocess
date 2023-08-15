@@ -60,10 +60,15 @@ for fp in listOfDataFiles:
 # %%
 # add all reduced data to one dataframe and save as CSV
 resultInternalCorr = pd.DataFrame(summaryList)
-resultInternalCorr.to_csv(f'{SETTINGS.output_dir}results_internally-corrected.csv', index=False)
+
+outDir = SETTINGS.output_dir
+if not os.path.exists(outDir):
+    os.mkdir(outDir)
+
+resultInternalCorr.to_csv(f'{outDir}results_internally-corrected.csv', index=False)
 
 comments = pd.DataFrame(commentList)
-comments.to_csv(f'{SETTINGS.output_dir}comments.csv', index=False)
+comments.to_csv(f'{outDir}comments.csv', index=False)
 
 
 # %%
@@ -71,17 +76,17 @@ comments.to_csv(f'{SETTINGS.output_dir}comments.csv', index=False)
 
 refPlot = resultInternalCorr[resultInternalCorr.type.eq(
     'standard')].plot(subplots=True, figsize=(8, 16))
-refPlot[0].get_figure().savefig(f'{SETTINGS.output_dir}NIST610-internal-corrected.png')
+refPlot[0].get_figure().savefig(f'{outDir}NIST610-internal-corrected.png')
 
 # %%
 # mass bias correction
 
 resultMBC = corr.massBias(resultInternalCorr)
-resultMBC.to_csv(f'{SETTINGS.output_dir}results_mass-bias-corrected.csv', index=False)
+resultMBC.to_csv(f'{outDir}results_mass-bias-corrected.csv', index=False)
 
 # %%
 # plot all observations of NIST control to check for drift after mass-bias correction
 
 ctrlPlot = resultMBC.loc[resultMBC.sample_name.str.contains(
     'NIST612'),~resultMBC.columns.str.contains('_err')].plot(subplots=True, figsize=(8, 16))
-ctrlPlot[0].get_figure().savefig(f'{SETTINGS.output_dir}NIST612-mass-bias-corrected.png')
+ctrlPlot[0].get_figure().savefig(f'{outDir}NIST612-mass-bias-corrected.png')
