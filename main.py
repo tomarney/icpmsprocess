@@ -1,20 +1,22 @@
 # %%
 # setup
-import os
-from typing import List
-import pandas as pd
-import matplotlib.pyplot as plt
 import glob
-import corrections as corr
-import calculations as calc
-from config import SETTINGS
+import os
 
+import pandas as pd
+
+import calculations as calc
+import corrections as corr
+from config import SETTINGS
 
 # %%
 # Process each data file
 
 # find all .exp files in the data directory
 listOfDataFiles = glob.glob(glob.escape(SETTINGS.data_dir) + "/*" + SETTINGS.file_ext)
+
+if len(listOfDataFiles) == 0:
+    raise RuntimeError("No data files found. Are the directory and file extension settings correct?")
 
 # load sample map (links file names to sample names and types)
 sampleMap = pd.read_csv(SETTINGS.sample_map)
@@ -40,19 +42,19 @@ for fp in listOfDataFiles:
     d = d.loc[:, SETTINGS.intensity_cols].dropna(how="all")
 
     # apply internal corrections
-    commInt, r = corr.internal(d)
+    commInt, r = corr.internal(d, sampleInfo)
     # reduce data to ratios with errors
-    commReduc, r = calc.reducePb(r, sampleInfo)
+    r = calc.reducePb(r, sampleInfo)
 
     comm = pd.Series({
       'sample_name': sampleInfo.sample_name.item(),
       'type': sampleInfo.type.item(),
       'blank_nrows': SETTINGS.blank_cycles - commInt.outlier_blank_cycles,
-      'signal_nrows': SETTINGS.signal_cycles[1] - SETTINGS.signal_cycles[0] - commInt.negative_signal_cycles - commReduc.outlier_signal_cycles
+      'signal_nrows': SETTINGS.signal_cycles[1] - SETTINGS.signal_cycles[0] - commInt.outlier_signal_cycles
     })
 
     summaryList.append(r)
-    commentList.append(pd.concat([comm,commInt,commReduc]))
+    commentList.append(pd.concat([comm,commInt]))
 # END for
 
 # %%

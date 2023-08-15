@@ -3,18 +3,18 @@
 
 # MS cycle timings
 # ----------------
-blank_cycles: 58
+blank_cycles: 56
 signal_cycles:
   - 60
-  - 172
+  - 114
 
 
 # package settings
 # ----------------
-sample_map: "inputs/run1/sample_map.csv"
+sample_map: "inputs/run3/sample-map_run3.csv"
 # data files settings
-data_dir: "inputs/run1/data/" # where the data files are
-output_dir: "output/run1/" # where to save CSV files and plots
+data_dir: "inputs/run3/data/" # where the data files are
+output_dir: "output/run3/" # where to save CSV files and plots
 file_ext: ".exp" # the file extension of the data files
 header_row: 22 # the row containing column headers (top row is row 0)
 comment_char: "*" # ignore any row starting with this (one character only)
@@ -25,5 +25,7 @@ intensity_cols: # the column names holding intensity (voltage) data
   - 206Pb
   - 207Pb
   - 208Pb
-low_signal_level: 2
-low_signal_metric: "Pb4_mean"
+low_signal_metric: "208Pb" # column name from the raw files of one isotope (e.g. "208Pb")
+low_signal_level: 0.005
+low_cycles_warning_frac: 0.5 # percentage of cycles left after cleaning below which to warn
+blank_upper_limit: 0.001

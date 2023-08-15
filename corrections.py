@@ -5,7 +5,7 @@ import cleaning
 from config import SETTINGS, CONST
 
 
-def internal(data: pd.DataFrame) -> Tuple[pd.Series, pd.DataFrame]:
+def internal(data: pd.DataFrame, sampleInfo: pd.DataFrame) -> Tuple[pd.Series, pd.DataFrame]:
     """
     Apply internal corrections to a single sample.
 
@@ -31,34 +31,31 @@ def internal(data: pd.DataFrame) -> Tuple[pd.Series, pd.DataFrame]:
     blankRaw = data.loc[blankCycles[0]: blankCycles[1]]
     signalRaw = data.loc[signalCycles[0]: signalCycles[1]]  # detect burn-through?
 
-    blankComms, blank = cleaning.removeOutliers(
-        blankRaw, commentName="outlier_blank_cycles")
+    blankComms, blank = cleaning.removeOutliers(blankRaw, sampleName=sampleInfo.sample_name.item()+" (blank)", commentName="outlier_blank_cycles", limitHi=True)
+    sigComms, signalClean = cleaning.removeOutliers(signalRaw, sampleName=sampleInfo.sample_name.item()+" (signal)", commentName="outlier_signal_cycles", limitLow=True)
 
     # subtract average blank
-    signal = signalRaw - blank.mean(axis=0)
-
-    # remove any cycles where the signal is smaller than the blank
-    sigComms, signalClean = cleaning.removeNegativeCycles(signal)
+    signal = signalClean - blank.mean(axis=0)
+    # TODO: do something with resulting negative cycles? There are usually only one or two, in one ratio, in 10% of samples
 
     # correct for Hg204 interference
-    Hg204 = signalClean.loc[:, "202Hg"] * CONST.Hg_4_2
-    signalClean.loc[:, "204Pb"] = signalClean.loc[:, "204Pb"] - Hg204
+    Hg204 = signal.loc[:, "202Hg"] * CONST.Hg_4_2
+    signal.loc[:, "204Pb"] = signal.loc[:, "204Pb"] - Hg204
 
     # combine comments
     comments = pd.concat([blankComms, sigComms])
 
-    return (comments, signalClean)
+    return (comments, signal)
 
 
 def massBias(data: pd.DataFrame) -> pd.DataFrame:
     """
-    Apply internal corrections to a single sample.
-    Corrections applies blank correction and accounts for isobaric interference of 204Hg on 204Pb, using 202Hg
+    Correct results by normalising to the accepted values of the standard, using sample-standard bracketing
 
     Parameters
     ----------
     data: Pandas.DataFrame
-      The DataFrame containing the raw mass spectrometry data
+      A DataFrame containing the internally corrected mass spectrometry data for each sample
     """
 
     # make sure DataFrame has a monotonically increasing int index
@@ -122,10 +119,8 @@ def massBias(data: pd.DataFrame) -> pd.DataFrame:
                 "Pb6_7_err":   row.Pb6_7_err,
                 "Pb8_7":       row.Pb8_7 / s.Pb8_7 * v.Pb_8_4 / v.Pb_7_4,
                 "Pb8_7_err":   row.Pb8_7_err,
-                "Pb4_mean":    row.Pb4_mean, # pass through (no correction)
-                "Pb4_mean_err":row.Pbint_err,
-                "Pbint":       row.Pbint, # pass through (no correction)
-                "Pbint_err":   row.Pbint_err
+                "Pb8_mean":    row.Pb8_mean, # pass through (no correction)
+                "Pb8_mean_err":row.Pb8_mean_err,
             }
         )
     # END for
