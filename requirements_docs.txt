@@ -1,0 +1,5 @@
+# includes all the package dependencies, plus those needed for building the docs
+pandas
+scipy
+ipykernel
+matplotlib
