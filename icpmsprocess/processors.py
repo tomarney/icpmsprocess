@@ -181,7 +181,7 @@ class MassBiasCorrector:
         if len(standard_row_indexes) == 0:
             raise ValueError("No standards found in dataset")
 
-        prev_std: Sample
+        prev_std = measurements[standard_row_indexes[0]]
         results: List[Sample] = []
 
         for run_order_number, measurement in enumerate(measurements):
