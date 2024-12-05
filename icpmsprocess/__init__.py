@@ -1,3 +1,4 @@
+import copy
 from typing import List
 import pandas as pd
 
@@ -28,7 +29,7 @@ class DataProcessor:
 
     def process(self, samples: List[Sample]) -> pd.DataFrame:
         processed_data = []
-        for sample in samples:
+        for sample in copy.deepcopy(samples):
             sample = self.internal_corrector.correct(sample)
             if sample.isotope_system.peak_strip is not None:
                 sample = self.ratio_calculator.strip_peaks(sample)
